@@ -1,0 +1,52 @@
+﻿<Window x:Class="QuizApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Викторина" Height="400" Width="500">
+    <Grid Margin="10">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+       
+        <Label x:Name="lblProgress"
+               FontSize="18"
+               FontWeight="Bold"
+               Content="Вопрос 1 из 5"/>
+
+        
+        <GroupBox Grid.Row="1" Header="Вопрос" Margin="0,10,0,10">
+            <StackPanel Margin="10">
+                <TextBlock x:Name="txtQuestion"
+                           FontSize="16"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,10"/>
+
+                <RadioButton x:Name="rb1" GroupName="answers" Margin="5"/>
+                <RadioButton x:Name="rb2" GroupName="answers" Margin="5"/>
+                <RadioButton x:Name="rb3" GroupName="answers" Margin="5"/>
+
+            </StackPanel>
+        </GroupBox>
+
+        
+        <ProgressBar x:Name="progressBar"
+                     Grid.Row="2"
+                     Height="25"
+                     Minimum="0"
+                     Maximum="5"
+                     Margin="0,0,0,10"/>
+
+        
+        <Button x:Name="btnNext"
+                Grid.Row="3"
+                Height="35"
+                Width="120"
+                HorizontalAlignment="Center"
+                Click="btnNext_Click"
+                Content="Далее"/>
+    </Grid>
+</Window>
