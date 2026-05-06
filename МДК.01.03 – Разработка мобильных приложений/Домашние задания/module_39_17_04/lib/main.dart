@@ -156,7 +156,6 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  // ✅ 5 КУЛЬТУРНЫХ И АДЕКВАТНЫХ ВОПРОСОВ
   final List<Map<String, dynamic>> _questions = [
     {
       'question': 'Кто написал роман "Тихий Дон"?',
@@ -229,81 +228,79 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 🏆 ЭКРАН РЕЗУЛЬТАТА
+    // 🏆 ЭКРАН РЕЗУЛЬТАТА С ГРАМОТОЙ
     if (_showResult) {
       widget.onFinish(_score);
+
+      // Форматируем дату: "17 апреля 2026"
+      final now = DateTime.now();
+      const months = [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+      ];
+      final formattedDate = '${now.day} ${months[now.month - 1]} ${now.year}';
+
       return Scaffold(
+        backgroundColor: const Color(0xFFF5F5F5),
         appBar: AppBar(
-          title: const Text('📊 Результат'),
+          title: const Text('🏆 Ваша грамота'),
           backgroundColor: Colors.deepPurple,
           foregroundColor: Colors.white,
+          centerTitle: true,
         ),
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(30),
-                decoration: BoxDecoration(
-                  color: _score == _questions.length
-                      ? Colors.green.shade50
-                      : _score > _questions.length / 2
-                      ? Colors.orange.shade50
-                      : Colors.red.shade50,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  _score == _questions.length
-                      ? Icons.emoji_events
-                      : _score > _questions.length / 2
-                      ? Icons.sentiment_satisfied
-                      : Icons.sentiment_dissatisfied,
-                  size: 80,
-                  color: _score == _questions.length
-                      ? Colors.amber
-                      : _score > _questions.length / 2
-                      ? Colors.orange
-                      : Colors.red,
-                ),
+          child: Container(
+            width: 350,
+            height: 500,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.deepPurple.shade100,
+                  Colors.deepPurple.shade50,
+                  Colors.white,
+                ],
               ),
-              const SizedBox(height: 32),
-              Text(
-                '$_score из ${_questions.length}',
-                style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.deepPurple.shade300,
+                width: 3,
               ),
-              const SizedBox(height: 16),
-              Text(
-                _score == _questions.length
-                    ? '✨ Идеально! Ты гений! ✨'
-                    : _score > _questions.length / 2
-                    ? '👍 Неплохо! Так держать! 👍'
-                    : '💪 Попробуй ещё раз! У тебя получится! 💪',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: _score == _questions.length
-                      ? Colors.green
-                      : _score > _questions.length / 2
-                      ? Colors.orange
-                      : Colors.red,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade300,
+                  blurRadius: 20,
+                  spreadRadius: 5,
                 ),
+              ],
+            ),
+            child: CustomPaint(
+              painter: CertificatePainter(
+                userName: 'Мингазов Я Саша',
+                score: _score,
+                totalQuestions: _questions.length,
+                formattedDate: formattedDate,
               ),
-              const SizedBox(height: 48),
-              ElevatedButton(
-                onPressed: () {
-                  _restart();
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: const Text('🔄 Играть снова', style: TextStyle(fontSize: 18)),
+            ),
+          ),
+        ),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(20),
+          child: ElevatedButton(
+            onPressed: () {
+              _restart();
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
               ),
-            ],
+            ),
+            child: const Text('🔄 Играть снова', style: TextStyle(fontSize: 18)),
           ),
         ),
       );
@@ -382,12 +379,191 @@ class _QuizScreenState extends State<QuizScreen> {
                       ),
                     ),
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+// ==================== КАСТОМНЫЙ ХУДОЖНИК ДЛЯ ГРАМОТЫ ====================
+
+class CertificatePainter extends CustomPainter {
+  final String userName;
+  final int score;
+  final int totalQuestions;
+  final String formattedDate;
+
+  CertificatePainter({
+    required this.userName,
+    required this.score,
+    required this.totalQuestions,
+    required this.formattedDate,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final width = size.width;
+    final height = size.height;
+
+    // Золотая рамка
+    final borderPaint = Paint()
+      ..color = const Color(0xFFFFD700)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+
+    final rect = RRect.fromLTRBR(10, 10, width - 10, height - 10, const Radius.circular(16));
+    canvas.drawRRect(rect, borderPaint);
+
+    // Медалька сверху
+    final medalPaint = Paint()
+      ..color = const Color(0xFFFFD700)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(width / 2, 70), 40, medalPaint);
+
+    final medalTextPainter = TextPainter(
+      text: const TextSpan(
+        text: '🏆',
+        style: TextStyle(fontSize: 40),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    medalTextPainter.layout();
+    medalTextPainter.paint(
+      canvas,
+      Offset(width / 2 - medalTextPainter.width / 2, 70 - medalTextPainter.height / 2),
+    );
+
+    // Заголовок "ГРАМОТА"
+    final titlePainter = TextPainter(
+      text: const TextSpan(
+        text: 'ГРАМОТА',
+        style: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF4A148C),
+          letterSpacing: 4,
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    titlePainter.layout(maxWidth: width - 40);
+    titlePainter.paint(canvas, Offset((width - titlePainter.width) / 2, 130));
+
+    // Линия под заголовком
+    final linePaint = Paint()
+      ..color = const Color(0xFFFFD700)
+      ..strokeWidth = 2;
+    canvas.drawLine(
+      Offset(width / 2 - 100, 165),
+      Offset(width / 2 + 100, 165),
+      linePaint,
+    );
+
+    // Текст "Награждается"
+    final awardPainter = TextPainter(
+      text: const TextSpan(
+        text: 'НАГРАЖДАЕТСЯ',
+        style: TextStyle(
+          fontSize: 14,
+          color: Color(0xFF757575),
+          letterSpacing: 2,
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    awardPainter.layout(maxWidth: width - 40);
+    awardPainter.paint(canvas, Offset((width - awardPainter.width) / 2, 190));
+
+    // Имя пользователя
+    final namePainter = TextPainter(
+      text: TextSpan(
+        text: userName,
+        style: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF4A148C),
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    namePainter.layout(maxWidth: width - 80);
+    namePainter.paint(canvas, Offset((width - namePainter.width) / 2, 230));
+
+    // Результат
+    final scorePainter = TextPainter(
+      text: const TextSpan(
+        text: 'за успешное прохождение викторины',
+        style: TextStyle(
+          fontSize: 14,
+          color: Color(0xFF616161),
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    scorePainter.layout(maxWidth: width - 80);
+    scorePainter.paint(canvas, Offset((width - scorePainter.width) / 2, 280));
+
+    // Счёт
+    final resultPainter = TextPainter(
+      text: TextSpan(
+        text: '$score из $totalQuestions баллов',
+        style: const TextStyle(
+          fontSize: 36,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFFFD700),
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    resultPainter.layout(maxWidth: width - 80);
+    resultPainter.paint(canvas, Offset((width - resultPainter.width) / 2, 320));
+
+    // Подпись
+    final signaturePainter = TextPainter(
+      text: const TextSpan(
+        text: '_______\nОрганизационный комитет',
+        style: TextStyle(
+          fontSize: 12,
+          color: Color(0xFF9E9E9E),
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    signaturePainter.layout(maxWidth: width - 80);
+    signaturePainter.paint(canvas, Offset((width - signaturePainter.width) / 2, 390));
+
+    // ✅ ДАТА ВНИЗУ (мелким шрифтом, серая, 14px, по центру)
+    final dateText = 'Дата: $formattedDate';
+    final datePainter = TextPainter(
+      text: TextSpan(
+        text: dateText,
+        style: const TextStyle(
+          fontSize: 14,
+          color: Color(0xFF9E9E9E),
+        ),
+      ),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    datePainter.layout(maxWidth: width - 80);
+    datePainter.paint(
+      canvas,
+      Offset((width - datePainter.width) / 2, height - 40),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
   }
 }
